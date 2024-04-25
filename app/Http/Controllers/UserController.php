@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUpdateUserFormRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,9 +13,15 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $search = $request->search;
+        $users = User::where(function ($query) use ($search) {
+            if($search) {
+                $query->where('email', $search);
+                $query->orWhere('name', 'LIKE', "%{$search}%");
+            }
+        })->get();
 
         return view('users.index', compact('users'));
     }
@@ -35,25 +42,14 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreUpdateUserFormRequest $request)
     {
-        $request->validate([
-            'name'      => 'required',
-            'email'     => 'required',
-            'password'  => 'required',
-        ]);
+        $data = $request->all();
+        $data['password'] = bcrypt($request->password);
 
-        try {
-            $user = User::create([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'password'  => bcrypt($request->password),
-            ]);
+        $user = User::create($data);
 
-            return redirect()->route('users.show', $user->id);
-        } catch(\Exception $e) {
-            return view('users.create')->with('Erro ao cadastrar usuário, verifique os dados e tente novamente');
-        }
+        return redirect()->route('users.index');
     }
 
     /**
@@ -65,7 +61,7 @@ class UserController extends Controller
     public function show($id)
     {
         if (!$user = User::find($id)) {
-            return redirect()->back();
+            return redirect()->route('users.index');
         }
 
         return view('users.show', compact('user'));
@@ -79,7 +75,11 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        if(!$user = User::find($id)) {
+            return redirect()->route('users.index');
+        }
+
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -91,7 +91,17 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if(!$user = User::find($id)) {
+            return redirect()->route('users.index');
+        }
+        
+        $data = $request->only('name', 'email');
+        if($request->password) {
+            $data['password'] = bcrypt($request->password);
+        }
+        $user->update($data);
+
+        return redirect()->route('users.index');
     }
 
     /**
@@ -102,6 +112,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (!$user = User::find($id)) {
+            return redirect()->route('users.index');
+        }
+        $user->delete();
+
+        return redirect()->route('users.index');
     }
 }
