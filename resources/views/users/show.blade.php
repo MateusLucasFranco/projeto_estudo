@@ -13,17 +13,20 @@
                     <tr>
                         <th class="col-2 border-top-0"> Nome </th>
                         <th class="col-3 border-top-0"> Email </th>
-                        <th class="col-2 border-top-0"> Senha </th>
                     </tr>
                 </thead>
                 <tbody>
                         <tr>
                             <td class="col-2 border-top-0">{{$user->name}}</td>
                             <td class="col-3 border-top-0">{{$user->email}}</td>
-                            <td class="col-2 border-top-0">{{$user->password}}</td>
                         </tr>
                 </tbody>
             </table>
+            <form action="{{ route('users.delete', $user->id)}}" method="POST">
+                @method('DELETE')
+                @csrf
+                <button class="btn btn-outline-danger"><i class="fas fa-trash"></i> Deletar</button>
+            </form>
         </div>
     </div>
 </div>
