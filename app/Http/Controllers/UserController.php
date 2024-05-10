@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdateUserFormRequest;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    protected $model;
+
+    public function __construct(User $user) {
+        $this->model = $user;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,13 +23,9 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->search;
-        $users = User::where(function ($query) use ($search) {
-            if($search) {
-                $query->where('email', $search);
-                $query->orWhere('name', 'LIKE', "%{$search}%");
-            }
-        })->get();
+        $users = $this->model->getUsers(
+            search: $request->search ?? ''
+        );
 
         return view('users.index', compact('users'));
     }
@@ -46,8 +50,12 @@ class UserController extends Controller
     {
         $data = $request->all();
         $data['password'] = bcrypt($request->password);
+        if ($request->image) {
+            $extension = $request->image->getClientOriginalExtension();
+            $data['image'] = $request->image->storeAs('users', $request->email . ".{$extension}");
+        }
 
-        $user = User::create($data);
+        $this->model->create($data);
 
         return redirect()->route('users.index');
     }
@@ -98,6 +106,14 @@ class UserController extends Controller
         $data = $request->only('name', 'email');
         if($request->password) {
             $data['password'] = bcrypt($request->password);
+        }
+        if ($request->image) {
+            $extension = $request->image->getClientOriginalExtension();
+            $image =  $request->email . ".{$extension}";
+            if (Storage::exists($user->image)) {
+                Storage::delete($user->image);
+            }
+            $data['image'] = $request->image->storeAs('users', $image);
         }
         $user->update($data);
 
