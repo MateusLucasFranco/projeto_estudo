@@ -13,7 +13,7 @@ class StoreUpdateUserFormRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -26,7 +26,12 @@ class StoreUpdateUserFormRequest extends FormRequest
         $id = $this->id ?? '';
 
         $rules = [
-            'name'      => 'required|string|max:255|min:3',
+            'name'      => [
+                'required' ,
+                'string',
+                'max:255',
+                'min:3',
+            ],
             'email'     => [
                 'required',
                 'email',
@@ -35,7 +40,11 @@ class StoreUpdateUserFormRequest extends FormRequest
             'password'  => [
                 'required',
                 'min:6',
-                'max:15'
+                'max:15',
+            ],
+            'image' => [
+                'required',
+                'image',
             ],
         ];
 
