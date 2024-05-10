@@ -12,13 +12,15 @@
                 <thead class="table-secondary">
                     <tr>
                         <th class="col-2 border-top-0"> Nome </th>
-                        <th class="col-3 border-top-0"> Email </th>
+                        <th class="border-top-0"> Email </th>
+                        <th class="border-top-0">  </th>
                     </tr>
                 </thead>
                 <tbody>
                         <tr>
                             <td class="col-2 border-top-0">{{$user->name}}</td>
                             <td class="col-3 border-top-0">{{$user->email}}</td>
+                            <td><img src="{{ url("storage/{$user->image}") }}" class="rounded float-start" alt="{{$user->name}}" style="width: 100px"></td>
                         </tr>
                 </tbody>
             </table>
