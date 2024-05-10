@@ -21,6 +21,7 @@
                         <th class="col-2 border-top-0"> Nome </th>
                         <th class="col-3 border-top-0"> Email </th>
                         <th class="col-2 border-top-0"> Ações </th>
+                        <th class="col-2 border-top-0"> Comentários </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,11 +33,18 @@
                                 <a href="{{route('users.edit', $user->id)}}" class="btn btn-outline-primary"><i class="fas fa-pen"></i> Editar</a>
                                 <a href="{{route('users.show', $user->id)}}" class="btn btn-outline-secondary"><i class="fas fa-clipboard-list"></i> Detalhes</a>
                             </td>
-                        
+                            <td class="col-3 border-top-0">
+                                <a href="{{route('comments.index', $user->id)}}" class="btn btn-outline-info"><i class="fas fa-comments"></i> Anotações( {{$user->comments->count()}} )</a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            <div>
+                {{$users->appends([
+                    'search' => request()->get('search', '')
+                ])->links('pagination::bootstrap-4')}}
+            </div>
         </div>
     </div>
 </div>
