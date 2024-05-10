@@ -9,7 +9,7 @@
                 </div>
                 <div class="card-body">
                     @include('includes.validations-form')
-                    <form method="POST" action="{{route('users.store')}}">
+                    <form method="POST" action="{{route('users.store')}}" enctype="multipart/form-data">
                         @include('users._partials.form')
                     </form>
                 </div>
