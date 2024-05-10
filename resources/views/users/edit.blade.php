@@ -9,7 +9,7 @@
                 </div>
                 <div class="card-body">
                     @include('includes.validations-form')
-                    <form method="POST" action="{{route('users.update', $user->id)}}">
+                    <form method="POST" action="{{route('users.update', $user->id)}}" enctype="multipart/form-data">
                         @method('PUT')
                         @include('users._partials.form')
                     </form>
